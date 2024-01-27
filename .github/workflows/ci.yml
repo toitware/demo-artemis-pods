@@ -1,0 +1,105 @@
+# Zero-Clause BSD License
+
+# Copyright (C) 2024 Toitware ApS.
+
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose with or without fee is hereby granted.
+
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+# REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+# FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+# INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+# OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+# PERFORMANCE OF THIS SOFTWARE.
+
+name: CI
+
+on:
+  push:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      pod-spec:
+        description: 'Pod spec to build/upload. Empty means all.'
+        required: false
+        default: ''
+      upload-to-production-fleet:
+        description: 'Upload to production fleet.'
+        type: boolean
+        required: false
+        default: false
+
+env:
+  # Set the production-fleet UUID at
+  # https://github.com/toitware/show-artemis-pods/settings/variables/actions
+  PRODUCTION_FLEET_UUID: ${{ vars.PRODUCTION_FLEET_UUID }}
+  # The tag that is used for pods that are uploaded when committed to the main branch.
+  MAIN_TAG: "latest-main"
+  # The fleet root (directory containing the fleet.json file).
+  FLEET_ROOT: "${{ github.workspace }}"
+  # The location of the pods.
+  PODS_DIR: "pods"
+  # Flags to the `find` that looks for the pod specs.
+  POD_FIND_FLAGS: "-maxdepth 1"
+  # Upload to production fleet on release.
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # TODO(florian): replace with v1.0.0 once released.
+      - uses: toitware/action-setup-artemis@72465b4f8e1ae3fd81d0db6d33d8460b0db6eaf0
+
+      - id: gitversion
+        # TODO(florian): replace with v1.0.0 once released.
+        uses: toitlang/action-git-version@7d6bbb3de16468288215e74594bd763b9de20576
+
+      - name: Log into Artemis
+        # Set the ARTEMIS_EMAIL and ARTEMIS_PASSWORD at
+        # https://github.com/toitware/show-artemis-pods/settings/secrets/actions
+        run: |
+          artemis auth login --email=${{ secrets.ARTEMIS_EMAIL }} --password=${{ secrets.ARTEMIS_PASSWORD }}
+
+      - name: Setup env
+        run: |
+          UPLOAD_TO_PRODUCTION=${{ github.event.inputs.upload-to-production-fleet == 'true' && github.event_name == 'release' }}
+          echo "UPLOAD_TO_PRODUCTION=$UPLOAD_TO_PRODUCTION" >> $GITHUB_ENV
+
+      - name: Upload pods
+        run: |
+          TMP_DIR=$(mktemp -d)
+
+          SPECS="${{ github.event.inputs.pod-spec }}"
+          if [ -z "$SPECS" ]; then
+            SPECS=$(find $PODS_DIR $POD_FIND_FLAGS -name "*-pod.yaml" -o -name "*-pod.yml" -o -name "*-pod.json" -type f)
+          fi
+
+          TAGS="--tag ${{ steps.gitversion.outputs.version }}"
+          RELEASE_TAG=$TAGS
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            TAGS="--tag $MAIN_TAG"
+          fi
+
+          for SPEC in $SPECS; do
+            POD_PATH=$TMP_DIR/$(basename $SPEC).pod
+
+            echo "Building $SPEC"
+            artemis --fleet-root=${{ env.FLEET_ROOT }} build $SPEC -o $POD_PATH
+
+            echo "Uploading $SPEC"
+            artemis --fleet-root=${{ env.FLEET_ROOT }} upload $TAGS $POD_PATH
+
+            if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
+              echo "Uploading $SPEC to production fleet"
+              artemis --fleet-root=${{ env.FLEET_ROOT }} upload --fleet-uuid $PRODUCTION_FLEET_UUID $RELEASE_TAG $POD_PATH
+            fi
+          done
+
+      - name: Roll out fleet
+        run: |
+          artemis --fleet-root=${{ env.FLEET_ROOT }} fleet roll-out
