@@ -63,7 +63,7 @@ jobs:
         # Set the ARTEMIS_EMAIL and ARTEMIS_PASSWORD at
         # https://github.com/toitware/show-artemis-pods/settings/secrets/actions
         run: |
-          artemis auth login --email=${{ secrets.ARTEMIS_EMAIL }} --password=${{ secrets.ARTEMIS_PASSWORD }}
+          artemis auth login --email='${{ secrets.ARTEMIS_EMAIL }}' --password='${{ secrets.ARTEMIS_PASSWORD }}'
 
       - name: Setup env
         run: |
