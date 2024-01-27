@@ -89,14 +89,14 @@ jobs:
             POD_PATH=$TMP_DIR/$(basename $SPEC).pod
 
             echo "Building $SPEC"
-            artemis --fleet-root=${{ env.FLEET_ROOT }} build $SPEC -o $POD_PATH
+            artemis --fleet-root=${{ env.FLEET_ROOT }} pod build $SPEC -o $POD_PATH
 
             echo "Uploading $SPEC"
-            artemis --fleet-root=${{ env.FLEET_ROOT }} upload $TAGS $POD_PATH
+            artemis --fleet-root=${{ env.FLEET_ROOT }} pod upload $TAGS $POD_PATH
 
             if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
               echo "Uploading $SPEC to production fleet"
-              artemis --fleet-root=${{ env.FLEET_ROOT }} upload --fleet-uuid $PRODUCTION_FLEET_UUID $RELEASE_TAG $POD_PATH
+              artemis --fleet-root=${{ env.FLEET_ROOT }} pod upload --fleet-uuid $PRODUCTION_FLEET_UUID $RELEASE_TAG $POD_PATH
             fi
           done
 
