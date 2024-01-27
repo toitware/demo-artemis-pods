@@ -40,7 +40,7 @@ env:
   # The fleet root (directory containing the fleet.json file).
   FLEET_ROOT: "${{ github.workspace }}"
   # The location of the pods.
-  PODS_DIR: "pods"
+  PODS_DIR: "./"
   # Flags to the `find` that looks for the pod specs.
   POD_FIND_FLAGS: "-maxdepth 1"
   # Upload to production fleet on release.
