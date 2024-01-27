@@ -57,7 +57,7 @@ jobs:
 
       - id: gitversion
         # TODO(florian): replace with v1.0.0 once released.
-        uses: toitlang/action-git-version@7d6bbb3de16468288215e74594bd763b9de20576
+        uses: toitlang/action-git-version@91c395a97b68bfb3257abc16505f8d215a440ae7
 
       - name: Log into Artemis
         # Set the ARTEMIS_EMAIL and ARTEMIS_PASSWORD at
