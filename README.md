@@ -1,4 +1,4 @@
-# Pod development with Artemis - Showcase
+# Showcase: Pod development with Artemis
 
 This repository demonstrates how development with Artemis can be done in
 combination with GitHub actions.
