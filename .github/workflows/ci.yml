@@ -52,12 +52,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # TODO(florian): replace with v1.0.0 once released.
-      - uses: toitware/action-setup-artemis@72465b4f8e1ae3fd81d0db6d33d8460b0db6eaf0
+      - uses: toitware/action-setup-artemis@v1.0.0
 
       - id: gitversion
-        # TODO(florian): replace with v1.0.0 once released.
-        uses: toitlang/action-git-version@91c395a97b68bfb3257abc16505f8d215a440ae7
+        uses: toitlang/action-git-version@v1.0.0
 
       - name: Log into Artemis
         # Set the ARTEMIS_EMAIL and ARTEMIS_PASSWORD at
