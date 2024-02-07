@@ -24,8 +24,9 @@ production fleet. This is typically done as part of a release, or
 with a workflow-dispatch. At this point the pod is not yet released, but
 can now be used by the production fleet.
 
-Note: the `fleet.json` uses the `latest-main` tag which is added for pods
-built when a new version is committed to the main branch.
+Note: the `fleet.json` uses the `latest` and `latest-main` tag.
+The `latest` tage is updated for each push, whereas `latest-main` is only
+added for pods built when a new version is committed to the main branch.
 
 ## GitHub actions
 

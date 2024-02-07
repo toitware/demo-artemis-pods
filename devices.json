@@ -1,1 +1,19 @@
-{}
+{
+  "3a7e1197-3fdf-5c51-9584-755ef2fc65d2": {
+    "name": "zealous-finding"
+  },
+  "512c9261-1b7f-5603-90b4-37cfc5cbdcd9": {
+    "name": "laughing-cold"
+  },
+  "6302ff5c-f062-5a08-9f43-de04199a4804": {
+    "name": "spare-force",
+    "group": "each-push"
+  },
+  "90f4f845-5ce8-54c1-ad1b-b82f875c9ff4": {
+    "name": "nice-review"
+  },
+  "ccc72244-0e79-5c2b-9219-d225c006287e": {
+    "name": "tender-bunch",
+    "group": "each-push"
+  }
+}
