@@ -51,6 +51,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Needed for action-git-version.
 
       - uses: toitware/action-setup-artemis@v1.1.0
 
