@@ -6,8 +6,8 @@ combination with GitHub actions.
 ## Setup
 
 We assume two repositories:
-1. https://github.com/toitware/show-artemis-pods: this repository.
-2. https://github.com/toitware/show-artemis-fleet: the fleet repository.
+1. https://github.com/toitware/demo-artemis-pods: this repository.
+2. https://github.com/toitware/demo-artemis-fleet: the fleet repository.
 
 Development of the code (pods) is done in this repository. Deployment and
 management of the fleet is done in the fleet repository.
