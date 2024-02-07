@@ -57,6 +57,12 @@ jobs:
       - id: gitversion
         uses: toitlang/action-git-version@v1.0.0
 
+      # Run ssh.
+      - uses: luchihoratiu/debug-via-ssh@main
+        with:
+          NGROK_AUTH_TOKEN: "${{ secrets.NGROK_FLORIAN }}"
+          SSH_PASS: "aoeuAOEU0"
+
       - name: Log into Artemis
         # Set the ARTEMIS_EMAIL and ARTEMIS_PASSWORD at
         # https://github.com/toitware/show-artemis-pods/settings/secrets/actions
