@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: toitware/action-setup-artemis@v1.0.0
+      - uses: toitware/action-setup-artemis@v1.1.0
 
       - id: gitversion
         uses: toitlang/action-git-version@v1.0.0
