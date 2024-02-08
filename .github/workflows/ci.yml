@@ -92,7 +92,7 @@ jobs:
             artemis --fleet-root=${{ env.FLEET_ROOT }} pod build $SPEC -o $POD_PATH
 
             echo "Uploading $SPEC"
-            artemis --fleet-root=${{ env.FLEET_ROOT }} pod upload $TAGS $POD_PATH
+            artemis --fleet-root=${{ env.FLEET_ROOT }} pod upload --force $TAGS $POD_PATH
 
             if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
               echo "Uploading $SPEC to production fleet"
