@@ -4,6 +4,9 @@
   "groups": {
     "default": {
       "pod": "demo-pod@latest-main"
+    },
+    "each-push": {
+      "pod": "demo-pod@latest"
     }
   }
 }
