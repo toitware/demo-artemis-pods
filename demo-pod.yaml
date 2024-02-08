@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://toit.io/schemas/artemis/pod-specification/v1.json
 
 version: 1
-name: show-pod
+name: demo-pod
 sdk-version: v2.0.0-alpha.130
 artemis-version: v0.15.0
 max-offline: 0s
