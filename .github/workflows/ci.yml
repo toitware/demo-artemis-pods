@@ -57,7 +57,7 @@ jobs:
       - uses: toitware/action-setup-artemis@v1.1.0
 
       - id: gitversion
-        uses: toitlang/action-git-version@v1.0.0
+        uses: toitlang/action-git-version@v1.1.0
 
       - name: Log into Artemis
         # Set the ARTEMIS_EMAIL and ARTEMIS_PASSWORD at
