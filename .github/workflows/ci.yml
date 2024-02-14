@@ -67,7 +67,7 @@ jobs:
 
       - name: Setup env
         run: |
-          UPLOAD_TO_PRODUCTION=${{ github.event.inputs.upload-to-production-fleet == 'true' && github.event_name == 'release' }}
+          UPLOAD_TO_PRODUCTION=${{ github.event.inputs.upload-to-production-fleet == 'true' || github.event_name == 'release' }}
           echo "UPLOAD_TO_PRODUCTION=$UPLOAD_TO_PRODUCTION" >> $GITHUB_ENV
 
       - name: Upload pods
