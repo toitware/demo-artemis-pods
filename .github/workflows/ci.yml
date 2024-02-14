@@ -32,18 +32,16 @@ on:
         default: false
 
 env:
-  # Set the production-fleet UUID at
-  # https://github.com/toitware/show-artemis-pods/settings/variables/actions
-  PRODUCTION_FLEET_UUID: ${{ vars.PRODUCTION_FLEET_UUID }}
   # The tag that is used for pods that are uploaded when committed to the main branch.
   MAIN_TAG: "latest-main"
   # The fleet root (directory containing the fleet.json file).
   FLEET_ROOT: "${{ github.workspace }}"
+  # The production fleet root (directory containing the fleet.json file).
+  PRODUCTION_FLEET_ROOT: "${{ github.workspace }}/production"
   # The location of the pods.
-  PODS_DIR: "./"
+  POD_SPECS_DIR: "./"
   # Flags to the `find` that looks for the pod specs.
   POD_FIND_FLAGS: "-maxdepth 1"
-  # Upload to production fleet on release.
 
 jobs:
   build:
@@ -65,18 +63,21 @@ jobs:
         run: |
           artemis auth login --email='${{ secrets.ARTEMIS_EMAIL }}' --password='${{ secrets.ARTEMIS_PASSWORD }}'
 
-      - name: Setup env
+      - name: Setup
         run: |
           UPLOAD_TO_PRODUCTION=${{ github.event.inputs.upload-to-production-fleet == 'true' || github.event_name == 'release' }}
           echo "UPLOAD_TO_PRODUCTION=$UPLOAD_TO_PRODUCTION" >> $GITHUB_ENV
 
+          TMP_DIR=$(mktemp -d)
+          PODS_DIR="$TMP_DIR/pods"
+          mkdir -p $PODS_DIR
+          echo "PODS_DIR=$PODS_DIR" >> $GITHUB_ENV
+
       - name: Upload pods
         run: |
-          TMP_DIR=$(mktemp -d)
-
           SPECS="${{ github.event.inputs.pod-spec }}"
           if [ -z "$SPECS" ]; then
-            SPECS=$(find $PODS_DIR $POD_FIND_FLAGS -name "*-pod.yaml" -o -name "*-pod.yml" -o -name "*-pod.json" -type f)
+            SPECS=$(find $POD_SPECS_DIR $POD_FIND_FLAGS -name "*-pod.yaml" -o -name "*-pod.yml" -o -name "*-pod.json" -type f)
           fi
 
           TAGS="--tag ${{ steps.gitversion.outputs.version }}"
@@ -86,7 +87,7 @@ jobs:
           fi
 
           for SPEC in $SPECS; do
-            POD_PATH=$TMP_DIR/$(basename $SPEC).pod
+            POD_PATH=$PODS_DIR/$(basename $SPEC).pod
 
             echo "Building $SPEC"
             artemis --fleet-root=${{ env.FLEET_ROOT }} pod build $SPEC -o $POD_PATH
@@ -96,10 +97,24 @@ jobs:
 
             if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
               echo "Uploading $SPEC to production fleet"
-              artemis --fleet-root=${{ env.FLEET_ROOT }} pod upload --fleet-uuid $PRODUCTION_FLEET_UUID $RELEASE_TAG $POD_PATH
+              artemis --fleet-root=${{ env.PRODUCTION_FLEET_ROOT }} pod upload $RELEASE_TAG $POD_PATH
             fi
           done
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pods
+          path: $PODS_DIR
 
       - name: Roll out fleet
         run: |
           artemis --fleet-root=${{ env.FLEET_ROOT }} fleet roll-out
+
+      - name: Upload release artifacts
+        if: github.event_name == 'release'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload --clobber ${{ github.event.release.tag_name }} $PODS_DIR/*
+
