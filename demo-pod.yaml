@@ -9,7 +9,7 @@ max-offline: 0s
 connections:
   - type: cellular
     requires:
-      - cellular  # References the cellular container below.
+      - bg96  # References the container below.
     config:
       cellular.apn: "onomondo"
       cellular.power: [25, 1]  # Pin 25, active high.
@@ -22,7 +22,7 @@ containers:
     entrypoint: src/hello.toit
     interval: 20s
 
-  cellular:
+  bg96:
     entrypoint: src/modules/quectel/bg96.toit
     git: https://github.com/toitware/cellular.git
     branch: v2.1.12
