@@ -97,7 +97,7 @@ jobs:
 
             if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
               echo "Uploading $SPEC to production fleet"
-              artemis --fleet-root=${{ env.PRODUCTION_FLEET_ROOT }} pod upload $RELEASE_TAG $POD_PATH
+              artemis --fleet-root=${{ env.PRODUCTION_FLEET_ROOT }} pod upload --force $RELEASE_TAG $POD_PATH
             fi
           done
 
