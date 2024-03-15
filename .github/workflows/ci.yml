@@ -36,8 +36,10 @@ env:
   MAIN_TAG: "latest-main"
   # The fleet root (directory containing the fleet.json file).
   FLEET_ROOT: "${{ github.workspace }}"
-  # The production fleet root (directory containing the fleet.json file).
-  PRODUCTION_FLEET_ROOT: "${{ github.workspace }}/production"
+  # The reference file to the production fleet.
+  # This file was created using 'artemis fleet create-reference -o production.ref' (from within
+  #   the production fleet directory).
+  PRODUCTION_FLEET_REF: "${{ github.workspace }}/production.ref"
   # The location of the pods.
   POD_SPECS_DIR: "./"
   # Flags to the `find` that looks for the pod specs.
@@ -97,7 +99,7 @@ jobs:
 
             if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
               echo "Uploading $SPEC to production fleet"
-              artemis --fleet-root=${{ env.PRODUCTION_FLEET_ROOT }} pod upload --force $RELEASE_TAG $POD_PATH
+              artemis --fleet-root=${{ env.PRODUCTION_FLEET_REF }} pod upload --force $RELEASE_TAG $POD_PATH
             fi
           done
 
