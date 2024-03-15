@@ -92,14 +92,14 @@ jobs:
             POD_PATH=$PODS_DIR/$(basename $SPEC).pod
 
             echo "Building $SPEC"
-            artemis --fleet-root=${{ env.FLEET_ROOT }} pod build $SPEC -o $POD_PATH
+            artemis --fleet=${{ env.FLEET_ROOT }} pod build $SPEC -o $POD_PATH
 
             echo "Uploading $SPEC"
-            artemis --fleet-root=${{ env.FLEET_ROOT }} pod upload --force $TAGS $POD_PATH
+            artemis --fleet=${{ env.FLEET_ROOT }} pod upload --force $TAGS $POD_PATH
 
             if [ "$UPLOAD_TO_PRODUCTION" = "true" ]; then
               echo "Uploading $SPEC to production fleet"
-              artemis --fleet-root=${{ env.PRODUCTION_FLEET_REF }} pod upload --force $RELEASE_TAG $POD_PATH
+              artemis --fleet=${{ env.PRODUCTION_FLEET_REF }} pod upload --force $RELEASE_TAG $POD_PATH
             fi
           done
 
@@ -111,7 +111,7 @@ jobs:
 
       - name: Roll out fleet
         run: |
-          artemis --fleet-root=${{ env.FLEET_ROOT }} fleet roll-out
+          artemis --fleet=${{ env.FLEET_ROOT }} fleet roll-out
 
       - name: Upload release artifacts
         if: github.event_name == 'release'
